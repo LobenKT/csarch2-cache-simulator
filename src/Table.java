@@ -42,6 +42,14 @@ public class Table {
             { "2", "5", "" },
             { "2", "6", "" },
             { "2", "7", "" },
+            { "3", "0", "" },
+			{ "3", "1", "" },
+            { "3", "2", "" },
+            { "3", "3", "" },
+            { "3", "4", "" },
+            { "3", "5", "" },
+            { "3", "6", "" },
+            { "3", "7", "" },
 		};
 
 		// Column Names
@@ -51,10 +59,8 @@ public class Table {
 		j = new JTable(data, columnNames);
 		j.setSize(200, 300);
 
-		// adding it to JScrollPane
-		JScrollPane sp = new JScrollPane(j);
 
-		f.add(sp);
+		f.add(j);
 		// Frame Size
 		f.setSize(500, 200);
 		// Frame Visible = true
