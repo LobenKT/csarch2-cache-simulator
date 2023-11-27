@@ -51,11 +51,18 @@ public class App {
         outerpanel.setBackground(Color.PINK);
 
         // Simulation Part
-        //JTextArea ta = new JTextArea();
+        JPanel simuPanel = new JPanel();
+        Table cache = new Table();
+        //Table main = new Table();
+        
+        simuPanel.add(cache.panel("Cache Memory"));
+        //simuPanel.add(main.panel("Main Memory"));
+
 
         // Adding Components to the frame
         frame.setLayout(new BorderLayout());
         frame.add(BorderLayout.SOUTH, outerpanel);
+        frame.add(BorderLayout.NORTH, simuPanel);
         
         frame.setVisible(true);
     }
