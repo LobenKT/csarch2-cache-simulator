@@ -45,21 +45,41 @@ public class CacheSimulation {
 
     // Simulate cache with 8-way BSA + MRU
     private void simulateCache(int numMemoryBlocks) {
+
         // TODO: Implement cache simulation logic based on the specified mapping and replacement policy
-        // Use the provided number of memory blocks and update the cache data structure accordingly
+        // DI KO SYOR 
+        // Simulate cache accesses
+        for (int i = 0; i < numMemoryBlocks; i++) {
+            int block = i % NUM_CACHE_BLOCKS;
+            int set = block % NUM_SETS;
 
-        // For demonstration purposes,
-        // markCacheLineAsHit(0, 0);
-        // markCacheLineAsHit(2, 1);
-        // markCacheLineAsHit(4, 2);
+            // Check if the cache line is already in the set
+            boolean cacheHit = false;
+            for (int way = 0; way < WAYS_PER_SET; way++) {
+                if (cacheData[set * WAYS_PER_SET + way][0].equals(String.valueOf(block))) {
+                    // Cache hit
+                    cacheHit = true;
 
-        // Placeholder simulation logic
-        for (int i = 0; i < NUM_CACHE_BLOCKS; i++) {
-            int set = i % NUM_SETS;
-            int block = i / WAYS_PER_SET;
-            markCacheLineAsHit(block, set);
+                    // Mark the cache line as Most Recently Used (MRU)
+                    markCacheLineAsMRU(set, way);
+
+                    break;
+                }
+            }
+
+            if (!cacheHit) {
+                // Cache miss
+                handleCacheMiss(set, block);
+            }
         }
     }
+
+        // Placeholder simulation logic
+        // for (int i = 0; i < NUM_CACHE_BLOCKS; i++) {
+        //     int set = i % NUM_SETS;
+        //     int block = i / WAYS_PER_SET;
+        //     markCacheLineAsHit(block, set);
+    
 
     // Mark a cache line as "hit" in the cache data structure
     private void markCacheLineAsHit(int block, int set) {
