@@ -1,7 +1,7 @@
 # CSARCH2 Cache Simulation System Project A.Y. 123T1
 
 #### Submitted by:
-##### Group 9
+##### CSARCH2 S12 Group 9
 ARCETA, Althea Zyrie M.
 
 DEQUICO, Beverly Joyce P.
