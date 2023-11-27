@@ -48,10 +48,10 @@ public class CacheSimulation {
         // TODO: Implement cache simulation logic based on the specified mapping and replacement policy
         // Use the provided number of memory blocks and update the cache data structure accordingly
 
-        // For demonstration purposes, let's just mark some cache lines as "hit" for now
-        markCacheLineAsHit(0, 0);
-        markCacheLineAsHit(2, 1);
-        markCacheLineAsHit(4, 2);
+        // For demonstration purposes,
+        // markCacheLineAsHit(0, 0);
+        // markCacheLineAsHit(2, 1);
+        // markCacheLineAsHit(4, 2);
     }
 
     // Mark a cache line as "hit" in the cache data structure
