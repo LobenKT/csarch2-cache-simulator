@@ -52,6 +52,13 @@ public class CacheSimulation {
         // markCacheLineAsHit(0, 0);
         // markCacheLineAsHit(2, 1);
         // markCacheLineAsHit(4, 2);
+
+        // Placeholder simulation logic
+        for (int i = 0; i < NUM_CACHE_BLOCKS; i++) {
+            int set = i % NUM_SETS;
+            int block = i / WAYS_PER_SET;
+            markCacheLineAsHit(block, set);
+        }
     }
 
     // Mark a cache line as "hit" in the cache data structure
@@ -84,8 +91,9 @@ public class CacheSimulation {
     // Update the cache table in the GUI with the simulated data
     private void updateCacheTable() {
         // TODO: Implement the logic to update the cache table in the GUI with the simulated data
-        // You can use the cacheData array to update the JTable
-        // For demonstration purposes, let's just update the GUI with the current cacheData
+        // can use the cacheData array to update the JTable
+
+        // update the GUI with the current cacheData
         cacheTable.updateTable(cacheData);
     }
 }
