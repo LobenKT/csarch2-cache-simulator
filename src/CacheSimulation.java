@@ -1,99 +1,102 @@
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.JButton;
 
 public class CacheSimulation {
     // Constants
     private static final int NUM_CACHE_BLOCKS = 32;
-    private static final int CACHE_LINE_SIZE = 64;
     private static final int NUM_SETS = 8;
-    private static final int WAYS_PER_SET = 8;
+    private static final int WAYS_PER_SET = 4; // Assuming 4 ways per set
 
     // Cache data structure
     private String[][] cacheData;
-
-    // GUI components
-    private JTextField memoryBlocksTextField;
-    private JRadioButton stepByStepRadioButton;
-    private JRadioButton finalMemoryRadioButton;
-    private Table cacheTable;
+    private Map<Integer, ArrayList<Integer>> mruTracker; // To track MRU for each set
 
     // Constructor
-    public CacheSimulation(JTextField memoryBlocksTextField, JRadioButton stepByStepRadioButton,
-                           JRadioButton finalMemoryRadioButton, Table cacheTable) {
-        this.memoryBlocksTextField = memoryBlocksTextField;
-        this.stepByStepRadioButton = stepByStepRadioButton;
-        this.finalMemoryRadioButton = finalMemoryRadioButton;
-        this.cacheTable = cacheTable;
-
-        // Initialize cache data structure
-        cacheData = new String[NUM_CACHE_BLOCKS][CACHE_LINE_SIZE + 2];
+    public CacheSimulation() {
+        // Initialize cache data structure and MRU tracker
+        cacheData = new String[NUM_CACHE_BLOCKS][3]; // [Set, Way, Data]
+        mruTracker = new HashMap<>();
         initializeCache();
-
-        // Set up action listener for the "Simulate" button
-        simulateButtonAction();
     }
 
     // Initialize cache with empty data
     private void initializeCache() {
         for (int i = 0; i < NUM_CACHE_BLOCKS; i++) {
-            for (int j = 0; j < CACHE_LINE_SIZE + 2; j++) {
-                cacheData[i][j] = "";
+            cacheData[i][0] = String.valueOf(i / WAYS_PER_SET); // Set number
+            cacheData[i][1] = String.valueOf(i % WAYS_PER_SET); // Way number
+            cacheData[i][2] = ""; // Data initially empty
+
+            // Initialize MRU tracker
+            int setNumber = i / WAYS_PER_SET;
+            mruTracker.putIfAbsent(setNumber, new ArrayList<>());
+        }
+    }
+
+    // Simulate cache method
+    public String[][] simulate(int numMemoryBlocks, ArrayList<String> inputSequence, boolean finalSnapshot) {
+        for (String input : inputSequence) {
+            try {
+                int memoryBlock = Integer.parseInt(input);
+                if (memoryBlock < numMemoryBlocks) {
+                    int setIndex = memoryBlock % NUM_SETS;
+                    processMemoryAccess(memoryBlock, setIndex);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Skipping invalid input: " + input);
             }
         }
+        return cacheData; // Return the final state of the cache
     }
 
-    // Simulate cache with 8-way BSA + MRU
-    private void simulateCache(int numMemoryBlocks) {
-        // TODO: Implement cache simulation logic based on the specified mapping and replacement policy
-        // Use the provided number of memory blocks and update the cache data structure accordingly
+    private void processMemoryAccess(int memoryBlock, int setIndex) {
+        int startIndex = setIndex * WAYS_PER_SET;
+        int endIndex = startIndex + WAYS_PER_SET;
+        boolean hit = false;
 
-        // For demonstration purposes,
-        // markCacheLineAsHit(0, 0);
-        // markCacheLineAsHit(2, 1);
-        // markCacheLineAsHit(4, 2);
+        // Check for hit
+        for (int i = startIndex; i < endIndex; i++) {
+            if (cacheData[i][2].equals(String.valueOf(memoryBlock))) {
+                hit = true;
+                updateMRU(setIndex, memoryBlock);
+                break;
+            }
+        }
 
-        // Placeholder simulation logic
-        for (int i = 0; i < NUM_CACHE_BLOCKS; i++) {
-            int set = i % NUM_SETS;
-            int block = i / WAYS_PER_SET;
-            markCacheLineAsHit(block, set);
+        // Process miss
+        if (!hit) {
+            handleCacheMiss(setIndex, memoryBlock);
         }
     }
 
-    // Mark a cache line as "hit" in the cache data structure
-    private void markCacheLineAsHit(int block, int set) {
-        cacheData[block * WAYS_PER_SET + set][CACHE_LINE_SIZE + 1] = "Hit";
-        // TODO: Update other relevant information in the cache data structure
+    // Update MRU list for a set
+    private void updateMRU(int setIndex, int memoryBlock) {
+        ArrayList<Integer> mruList = mruTracker.get(setIndex);
+        mruList.remove(Integer.valueOf(memoryBlock)); // Remove if present
+        mruList.add(0, memoryBlock); // Add to the front as most recently used
     }
 
-    // Action listener for the "Simulate" button
-    private void simulateButtonAction() {
-        JButton simulateButton = new JButton("Simulate");
-        simulateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Get the number of memory blocks from the user input
-                int numMemoryBlocks = Integer.parseInt(memoryBlocksTextField.getText());
+    // Handle a cache miss
+    private void handleCacheMiss(int setIndex, int memoryBlock) {
+        ArrayList<Integer> mruList = mruTracker.get(setIndex);
+        int startIndex = setIndex * WAYS_PER_SET;
 
-                // Simulate the cache based on the selected options
-                if (stepByStepRadioButton.isSelected()) {
-                    // TODO: Implement step-by-step tracing (animation)
-                } else if (finalMemoryRadioButton.isSelected()) {
-                    // Simulate the cache and update the GUI with the final memory snapshot
-                    simulateCache(numMemoryBlocks);
-                    updateCacheTable();
+        if (mruList.size() < WAYS_PER_SET) {
+            // There's space in the cache set
+            cacheData[startIndex + mruList.size()][2] = String.valueOf(memoryBlock);
+            mruList.add(0, memoryBlock);
+        } else {
+            // Replace the least recently used block
+            int lruBlock = mruList.remove(mruList.size() - 1);
+            for (int i = startIndex; i < startIndex + WAYS_PER_SET; i++) {
+                if (cacheData[i][2].equals(String.valueOf(lruBlock))) {
+                    cacheData[i][2] = String.valueOf(memoryBlock);
+                    break;
                 }
             }
-        });
-    }
-
-    // Update the cache table in the GUI with the simulated data
-    private void updateCacheTable() {
-        // TODO: Implement the logic to update the cache table in the GUI with the simulated data
-        // can use the cacheData array to update the JTable
-
-        // update the GUI with the current cacheData
-        cacheTable.updateTable(cacheData);
+            mruList.add(0, memoryBlock);
+        }
     }
 }

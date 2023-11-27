@@ -1,35 +1,35 @@
-// Packages to import
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTable;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public class Table {
-	JTable j;
+    private JTable table;
+    private DefaultTableModel model;
+    private String[] columnNames; // Now an instance variable
 
-	// Constructor
-	JPanel panel(String title, String[][] data)
-	{
-		// Frame initialization
-		JPanel f = new JPanel();
-        JLabel label2 = new JLabel(title);
-        f.add(label2);
+    public Table() {
+        // Initialize column names here or through a constructor parameter
+        this.columnNames = new String[]{"Block", "Block Set", "Data"};
+    }
 
-		// Column Names
-		String[] columnNames = { "Block", "Block Set", "Data" };
+    public JPanel panel(String title, String[][] data) {
+        JPanel panel = new JPanel();
+        JLabel label = new JLabel(title);
+        panel.add(label);
 
-		// Initializing the JTable
-		j = new JTable(data, columnNames);
-		j.setSize(200, 800);
+        // Initializing the JTable with a DefaultTableModel
+        model = new DefaultTableModel(data, columnNames);
+        table = new JTable(model);
+        table.setSize(200, 800);
 
+        panel.add(new JScrollPane(table)); // Add table to JScrollPane for scroll functionality
+        panel.setSize(500, 200);
+        panel.setVisible(true);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-		f.add(j);
-		// Frame Size
-		f.setSize(500, 200);
-		// Frame Visible = true
-		f.setVisible(true);
-        f.setLayout(new BoxLayout(f, BoxLayout.Y_AXIS));
+        return panel;
+    }
 
-        return f;
-	}
+    public void updateTable(String[][] newData) {
+        model.setDataVector(newData, columnNames);
+    }
 }
