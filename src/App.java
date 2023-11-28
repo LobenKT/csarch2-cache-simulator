@@ -101,7 +101,7 @@ public class App {
         // Adding Components to the frame
         frame.setLayout(new BorderLayout());
         frame.add(BorderLayout.SOUTH, outerpanel);
-        frame.add(BorderLayout.NORTH, simuPanel);
+        frame.add(BorderLayout.CENTER, simuPanel);
         
         // When simulate is clicked
         send.addActionListener((ActionListener) new ActionListener(){
@@ -354,7 +354,7 @@ public class App {
 
         // Adding Components to the frame
         frame.setLayout(new BorderLayout());
-        frame.add(BorderLayout.SOUTH, outerpanel);
+        //frame.add(BorderLayout.SOUTH, outerpanel);
         frame.add(BorderLayout.NORTH, simuPanel);
         
         // When simulate is clicked

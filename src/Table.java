@@ -1,4 +1,6 @@
 // Packages to import
+import java.awt.BorderLayout;
+
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,14 +18,16 @@ public class Table {
         f.add(label2);
 
 		// Column Names
-		String[] columnNames = { "Block", "Block Set", "Data" };
+		String[] columnNames = { "Block Set", "Block", "Data" };
 
 		// Initializing the JTable
 		j = new JTable(data, columnNames);
 		j.setSize(200, 800);
 
 
-		f.add(j);
+		f.add(j.getTableHeader(), BorderLayout.NORTH);
+		f.add(j, BorderLayout.CENTER);
+		
 		// Frame Size
 		f.setSize(500, 200);
 		// Frame Visible = true
