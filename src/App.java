@@ -115,8 +115,8 @@ public class App {
                 //System.out.println("User input: " + inputValue);
                 //System.out.println(testcase.length);
                 ArrayList<String> inputarr = new ArrayList<String>( Arrays.asList(testcase));
-                if (testcase.length < n*2){ //if input are less than
-                    for (int i = testcase.length; i < n*2; i++) {
+                if (testcase.length < n){ //if input are less than
+                    for (int i = testcase.length; i < n; i++) {
                         inputarr.add(null);
                     }
                 }
@@ -146,7 +146,7 @@ public class App {
 
     public static int isThere(String[][] data, int start, int end, int val){
         for(int i = start; i < end; i++){
-            int var = Integer.parseInt(data[i][2]);
+            int var = Integer.valueOf(data[i][2]);
             if(var == val){
                 return i;
             }
@@ -155,6 +155,8 @@ public class App {
     }
     
     public static void fSnap(String[][] data, ArrayList<String> inputarr, int n) {
+        int hitcount = 0;
+        int misscount = 0;
         int set0, set1, set2, set3;
             set0 = 0;
             set1 = 0;
@@ -162,17 +164,21 @@ public class App {
             set3 = 0;
             int k, l;
 
-        for (int i = 0; i < n*2; i++) {
+        for (int i = 0; i < n; i++) {
             int val = Integer.valueOf(inputarr.get(i));
             
 
             switch (val % 4) {
                 case 0:
                     k = notFull(data, 0, 8);
-                    l = isThere(data, 0, k, val);
+                    if(k != -1)
+                        l = isThere(data, 0, k, val);
+                    else
+                        l = isThere(data, 0, 8, val);
                     //hit
                     if(l != -1){
                         set0 = l;
+                        hitcount++;
                     } else {
                         //miss
                         if (k != -1) {
@@ -181,16 +187,21 @@ public class App {
                         } else {
                             data[set0][2] = inputarr.get(i);
                         }
+                        misscount++;
                     }
-                    System.out.println("Val:"+val%4 + " K: " + k + " L: " + l);
+                    System.out.println(i +" Val:"+val%4 + " K: " + k + " L: " + l);
                     break;
 
                 case 1:
                     k = notFull(data, 8, 16);
-                    l = isThere(data, 8, k, val);
+                    if(k != -1)
+                        l = isThere(data, 8, k, val);
+                    else
+                        l = isThere(data, 8, 16, val);
                     //hit
                     if(l != -1){
                         set1 = l;
+                        hitcount++;
                     } else {
                         //miss
                         if (k != -1) {
@@ -199,16 +210,21 @@ public class App {
                         } else {
                             data[set1][2] = inputarr.get(i);
                         }
+                        misscount++;
                     }
-                    System.out.println("Val:"+val%4 + " K: " + k + " L: " + l);
+                    System.out.println(i + " Val:"+val%4 + " K: " + k + " L: " + l);
                     break;
                     
                 case 2:
                     k = notFull(data, 16, 24);
-                    l = isThere(data, 16, k, val);
+                    if(k != -1)
+                        l = isThere(data, 16, k, val);
+                    else
+                        l = isThere(data, 16, 24, val);
                     //hit
                     if(l != -1){
                         set2 = l;
+                        hitcount++;
                     } else {
                         //miss
                         if (k != -1 && k > 8) {
@@ -217,16 +233,21 @@ public class App {
                         } else {
                             data[set2][2] = inputarr.get(i);
                         }
+                        misscount++;
                     }
-                    System.out.println("Val:"+val%4 + " K: " + k + " L: " + l);
+                    System.out.println(i + " Val:"+val%4 + " K: " + k + " L: " + l);
                     break;
                     
                 case 3:
                     k = notFull(data, 24, 32);
-                    l = isThere(data, 24, k, val);
+                    if(k != -1)
+                        l = isThere(data, 24, k, val);
+                    else
+                        l = isThere(data, 24, 32, val);
                     //hit
                     if(l != -1){
                         set3 = l;
+                        hitcount++;
                     } else {
                         //miss
                         if (k != -1) {
@@ -235,13 +256,19 @@ public class App {
                         } else {
                             data[set3][2] = inputarr.get(i);
                         }
+                        misscount++;
                     }
-                    System.out.println("Val:"+val%4 + " K: " + k + " L: " + l);
+                    System.out.println(i+ " Val:"+val%4 + " K: " + k + " L: " + l);
                     break;
             }
 
             
         }
+
+        float hitrate = (float) hitcount/(n);
+        float missrate = (float) misscount/(n);
+        float average_time = (hitrate) + (missrate*326);
+        float total_time = (hitcount) + (misscount*641);
 
         // new frame again
         // Creating the Frame
@@ -296,8 +323,33 @@ public class App {
         // Simulation Part
         JPanel simuPanel = new JPanel();
         Table cache = new Table();
+
+        JPanel textpanel = new JPanel();
+        JLabel memory_accesstime_label = new JLabel("Memory Access Time: " + String.valueOf(n));
+        JLabel hit_label = new JLabel("Hit Count: " + String.valueOf(hitcount));
+        JLabel miss_label = new JLabel("Miss Time: " + String.valueOf(misscount));
+        JLabel hitrate_label = new JLabel("Hit Rate: " + String.valueOf(hitrate*100) + "%");
+        JLabel missrate_label = new JLabel("Miss Rate: " + String.valueOf(missrate*100) + "%");
+        JLabel avetime_label = new JLabel("Average Time: " + String.valueOf(average_time) + "ns");
+        JLabel totaltime_label = new JLabel("Total Time: " + String.valueOf(total_time) + "ns");
+        memory_accesstime_label.setFont(new Font("Verdana",1,20));
+        hit_label.setFont(new Font("Verdana",1,20));
+        miss_label.setFont(new Font("Verdana",1,20));
+        hitrate_label.setFont(new Font("Verdana",1,20));
+        missrate_label.setFont(new Font("Verdana",1,20));
+        avetime_label.setFont(new Font("Verdana",1,20));
+        totaltime_label.setFont(new Font("Verdana",1,20));
+        textpanel.add(memory_accesstime_label);
+        textpanel.add(hit_label);
+        textpanel.add(miss_label);
+        textpanel.add(hitrate_label);
+        textpanel.add(missrate_label);
+        textpanel.add(avetime_label);
+        textpanel.add(totaltime_label);
+        textpanel.setLayout(new BoxLayout(textpanel, BoxLayout.Y_AXIS));
         
         simuPanel.add(cache.panel("Cache Memory", data));
+        simuPanel.add(textpanel);
 
         // Adding Components to the frame
         frame.setLayout(new BorderLayout());
