@@ -114,3 +114,15 @@ Using the  formula `Total Access Time = H*C + M*(1+CL*MA)` where H is the hit co
 Plugging in the values, we get `TAT = 96*1 + 160*(1+64*10) = 102656`.
 
 Thus, the total memory access time is ***102656***.
+
+##### b.) Random Sequence
+
+In the random sequence, we are passing a total of 128 blocks, in no particular order and assumed to be not necessarily unique. With that, we are unable to determine for certain the exact counts, rates, and access times for sure. This is because a random non unique sequence can vary heavily, particularly depending on the maximum memory block value that is set in generating the sequence. In the best case, the number of misses will be equal to the number of unique memory blocks that are present in the sequence, and the remaining blocks are hits. This is assuming that there is enough space in the cache to accomodate the number of unique blocks, i.e. at most 32 unique values in this case. In the worst case, all the blocks are unique and every memory access is a cache miss. This 0 hit all miss result is also possible if the sequence 
+just so happens to only repeat a specific memory block in a set after it has been filled up and then overwritten by another block. This is due to the 8-way block set associative design.
+
+Thus, this results in ***128*** memory accesses, a cache hit count that ***can be as low as 0 and can only be as high as 1 less than the memory accesses***, a cache miss count that is ***at least 1 and can be as high as equal to the memory accesses***, with its corresponding hit/miss rates, as well as largely varying access times.
+
+
+##### c.) Mid-Repeat Blocks: 
+
+In the mid-repeat blocks test case, the memory blocks to be passed are 0
