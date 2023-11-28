@@ -55,8 +55,9 @@ public class App {
             { "3", "7", "" },
         };
         mruBlock = new int[4]; // Assuming 4 sets, initialize with default values
+        Arrays.fill(mruBlock, 7); // Initialize each set's MRU to point to the last block (block 7)
         inputarr = new ArrayList<>();
-        stepTimer = new Timer(500, e -> processNextStep()); // Delay of 1000 ms (1 second)
+        stepTimer = new Timer(0, e -> processNextStep()); // Delay of 1000 ms (1 second)
         initializeUI();
     }
 
@@ -127,7 +128,7 @@ public class App {
             if (j1.isSelected()) {
                 // Step-by-Step Tracing
                 currentStep = 0;
-                processStep(inputarr.get(currentStep));
+                processStep();
             } else if (j2.isSelected()) {
                 // Final Snapshot
                 fSnap(default_data, inputarr, n);
@@ -152,52 +153,60 @@ public class App {
         tableModel.setDataVector(cacheData, new String[]{"Set", "Block", "Value"});
     }
 
-    private void processStep(String input) {
-        if (input != null && !input.isEmpty()) {
-            int val = Integer.parseInt(input);
-            int setNum = val % 4; // Assuming 4 sets in the cache
+    private void processStep() {
+        if (currentStep < inputarr.size()) {
+            String input = inputarr.get(currentStep);
+            if (input != null && !input.isEmpty()) {
+                int val = Integer.parseInt(input);
+                int setNum = val % 4; // Assuming 4 sets in the cache
+                int start = setNum * 8; // Assuming 8 blocks per set
+                int end = start + 8;
     
-            int start = setNum * 8; // Assuming 8 blocks per set
-            int end = start + 8;
+                int existingIndex = isThere(default_data, start, end, val);
+                int emptyIndex = notFull(default_data, start, end);
     
-            int emptyIndex = notFull(default_data, start, end);
-            int existingIndex = isThere(default_data, start, end, val);
-    
-            if (existingIndex != -1) {
-                // Cache hit
-                default_data[existingIndex][2] = String.valueOf(val);
-                mruBlock[setNum] = existingIndex; // Update MRU block
-            } else {
-                // Cache miss
-                if (emptyIndex != -1) {
-                    // Use an empty block if available
-                    default_data[emptyIndex][2] = String.valueOf(val);
-                    mruBlock[setNum] = emptyIndex; // Update MRU block
+                // Check for cache hit or miss
+                if (existingIndex != -1) {
+                    // Cache hit
+                    // Update MRU for the set
+                    mruBlock[setNum] = existingIndex - start;
                 } else {
-                    // Replace the MRU block
-                    int replaceIndex = mruBlock[setNum];
-                    default_data[replaceIndex][2] = String.valueOf(val);
-                    mruBlock[setNum] = replaceIndex; // Update MRU block
+                    // Cache miss
+                    if (emptyIndex != -1) {
+                        // If there is an empty block, use it
+                        default_data[emptyIndex][2] = String.valueOf(val);
+                        mruBlock[setNum] = emptyIndex - start;
+                    } else {
+                        // If all blocks are full, replace the MRU block
+                        int mruIndex = start + mruBlock[setNum];
+                        default_data[mruIndex][2] = String.valueOf(val);
+    
+                        // Update MRU to point to the next block (circularly)
+                        mruBlock[setNum] = (mruBlock[setNum] + 1) % 8;
+                    }
                 }
+    
+                // Update and display the cache state
+                displayCacheState(default_data);
             }
     
-            // Update and display the cache state
-            displayCacheState(default_data);
-        }
-    
-        // Increment step or handle completion
-        currentStep++;
-        if (currentStep < inputarr.size()) {
-            stepTimer.setRepeats(false); // Make sure the Timer only runs once for each step
-            stepTimer.start(); // Start the Timer to process the next step after a delay
-        } else {
-            JOptionPane.showMessageDialog(frame, "Step-by-Step Tracing Completed");
+            // Increment step for the next iteration
+            currentStep++;
+            if (currentStep < inputarr.size()) {
+                stepTimer.setRepeats(false); // Ensure the Timer only runs once for each step
+                stepTimer.start(); // Start the Timer to process the next step after a delay
+            } else {
+                JOptionPane.showMessageDialog(frame, "Step-by-Step Tracing Completed");
+            }
         }
     }
     
+    
+    
+    
     private void processNextStep() {
         if (currentStep < inputarr.size()) {
-            processStep(inputarr.get(currentStep));
+            processStep();
         }
     }
     
