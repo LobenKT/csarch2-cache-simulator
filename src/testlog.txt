@@ -1,0 +1,5 @@
+0 | Set 0 | Block 0 | Status: Miss |
+1 | Set 1 | Block 0 | Status: Miss |
+2 | Set 2 | Block 0 | Status: Miss |
+3 | Set 3 | Block 0 | Status: Miss |
+4 | Set 0 | Block 1 | Status: Miss |

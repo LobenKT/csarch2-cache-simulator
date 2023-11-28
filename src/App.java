@@ -1,12 +1,27 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class App {
-    static String[][] default_data = {
-			{ "0", "0", "" },
+    private JFrame frame;
+    private JTable cacheTable;
+    private String[][] default_data;
+    private JPanel simuPanel;
+    private int currentStep = 0;
+    private ArrayList<String> inputarr;
+    private int[] mruBlock; // Initialize this array in the constructor
+    private Timer stepTimer;
+
+
+
+    public App() {
+        default_data = new String[][] {
+            // Initialize your default data here...
+            { "0", "0", "" },
 			{ "0", "1", "" },
             { "0", "2", "" },
             { "0", "3", "" },
@@ -38,15 +53,21 @@ public class App {
             { "3", "5", "" },
             { "3", "6", "" },
             { "3", "7", "" },
-		};
-    public static void main(String[] args) {
-        // Creating the Frame
-        JFrame frame = new JFrame("8-way BSA + MRU");
+        };
+        mruBlock = new int[4]; // Assuming 4 sets, initialize with default values
+        inputarr = new ArrayList<>();
+        stepTimer = new Timer(1000, e -> processNextStep()); // Delay of 1000 ms (1 second)
+        initializeUI();
+    }
+
+    private void initializeUI() {
+        frame = new JFrame("8-way BSA + MRU");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1500, 800);
 
-        // Creating the panel at bottom and adding components
-        JPanel outerpanel = new JPanel(); 
+        JPanel outerPanel = new JPanel();
+        // Initialize other panels and components...
+        // Add them to outerPanel...
         JPanel panel = new JPanel(); 
         JPanel bpanel = new JPanel();
         JPanel panel2 = new JPanel();
@@ -83,101 +104,113 @@ public class App {
         bpanel.setBackground(Color.LIGHT_GRAY);
         panel2.setBackground(Color.LIGHT_GRAY);
 
-        outerpanel.add(panel);
-        outerpanel.add(bpanel);
-        outerpanel.add(panel2);
-        outerpanel.setLayout(new BoxLayout(outerpanel, BoxLayout.Y_AXIS));
-        outerpanel.setBackground(Color.PINK);
+        outerPanel.add(panel);
+        outerPanel.add(bpanel);
+        outerPanel.add(panel2);
+        outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
+        outerPanel.setBackground(Color.PINK);
 
-        // Simulation Part
-        JPanel simuPanel = new JPanel();
-        Table cache = new Table();
-        
-        simuPanel.add(cache.panel("Cache Memory", default_data));
+        simuPanel = new JPanel();
 
-        // Adding Components to the frame
-        frame.setLayout(new BorderLayout());
-        frame.add(BorderLayout.SOUTH, outerpanel);
-        frame.add(BorderLayout.CENTER, simuPanel);
-        
-        // When simulate is clicked
-        send.addActionListener((ActionListener) new ActionListener(){
-            int currentStep = 0; // Add this instance variable to track the current step
+        // Button action listener
+        send.addActionListener(e -> {
+            int n = Integer.parseInt(tf.getText());
+            String inputValue = tf1.getText();
+            String[] testcase = inputValue.split("\\s");
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int n = Integer.valueOf(tf.getText());
-                String inputValue = tf1.getText().toString();
-                String[] testcase = inputValue.split("\s");
-
-                ArrayList<String> inputarr = new ArrayList<String>( Arrays.asList(testcase));
-                if (testcase.length < n){ //if input are less than
-                    for (int i = testcase.length; i < n; i++) {
-                        inputarr.add(null);
-                    }
-                }
-                
-                if(j1.isSelected()){
-                    //TODO : Step-by-Step Tracing
-                    if (currentStep < n) {
-                        int val = Integer.valueOf(inputarr.get(currentStep));
-                        int setNum = val % 4;
-                        int k, l;
-            
-                        switch (setNum) {
-                            case 0:
-                                k = notFull(default_data, 0, 8);
-                                if (k != -1)
-                                    l = isThere(default_data, 0, k, val);
-                                else
-                                    l = isThere(default_data, 0, 8, val);
-            
-                                if (l != -1) {
-                                    // Cache hit
-                                    // Update cache state here
-                                    // Display cache state
-                                    displayCacheState(default_data);
-                                } else {
-                                    // Cache miss
-                                    if (k != -1) {
-                                        default_data[k][2] = inputarr.get(currentStep);
-                                    } else {
-                                        default_data[setNum][2] = inputarr.get(currentStep);
-                                    }
-                                    // Update your cache state here
-                                    // Display cache state
-                                    displayCacheState(default_data);
-                                }
-                                break;
-                            
-                            // TODO: Handle other cases (setNum 1, 2, 3) similarly
-                            // ...
-            
-                            default:
-                                //TODO: Handle invalid input
-                                break;
-                        }
-                        currentStep++;
-                    } else {
-                        // Step-by-Step Tracing is complete, reset the current step if needed
-                        // TODO: add a message to indicate completion
-                    }
-
-
-                } else if(j2.isSelected()){
-                    //Final Snapshot
-                    fSnap(default_data, inputarr, n);
-                }
+            inputarr.clear();
+            inputarr.addAll(Arrays.asList(testcase));
+            while (inputarr.size() < n) {
+                inputarr.add(null);
             }
-                // TODO: Define the displayCacheState method to update the GUI with cache data
-             private void displayCacheState(String[][] cacheData) {
-            
-                }
+
+            if (j1.isSelected()) {
+                // Step-by-Step Tracing
+                currentStep = 0;
+                processStep(inputarr.get(currentStep));
+            } else if (j2.isSelected()) {
+                // Final Snapshot
+                fSnap(default_data, inputarr, n);
+            }
         });
+
+        initializeCacheTable();
+        frame.add(simuPanel, BorderLayout.CENTER);
+        frame.add(outerPanel, BorderLayout.SOUTH);
         frame.setVisible(true);
     }
 
-    public static int notFull(String[][] data, int start, int end){
+    private void initializeCacheTable() {
+        DefaultTableModel tableModel = new DefaultTableModel(default_data, new String[]{"Set", "Block", "Value"});
+        cacheTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(cacheTable);
+        simuPanel.add(scrollPane);
+    }
+    
+    private void displayCacheState(String[][] cacheData) {
+        DefaultTableModel tableModel = (DefaultTableModel) cacheTable.getModel();
+        tableModel.setDataVector(cacheData, new String[]{"Set", "Block", "Value"});
+    }
+
+    private void processStep(String input) {
+        if (input != null && !input.isEmpty()) {
+            int val = Integer.parseInt(input);
+            int setNum = val % 4; // Assuming 4 sets in the cache
+    
+            int start = setNum * 8; // Assuming 8 blocks per set
+            int end = start + 8;
+    
+            int emptyIndex = notFull(default_data, start, end);
+            int existingIndex = isThere(default_data, start, end, val);
+    
+            if (existingIndex != -1) {
+                // Cache hit
+                default_data[existingIndex][2] = String.valueOf(val);
+                mruBlock[setNum] = existingIndex; // Update MRU block
+            } else {
+                // Cache miss
+                if (emptyIndex != -1) {
+                    // Use an empty block if available
+                    default_data[emptyIndex][2] = String.valueOf(val);
+                    mruBlock[setNum] = emptyIndex; // Update MRU block
+                } else {
+                    // Replace the MRU block
+                    int replaceIndex = mruBlock[setNum];
+                    default_data[replaceIndex][2] = String.valueOf(val);
+                    mruBlock[setNum] = replaceIndex; // Update MRU block
+                }
+            }
+    
+            // Update and display the cache state
+            displayCacheState(default_data);
+        }
+    
+        // Increment step or handle completion
+        currentStep++;
+        if (currentStep < inputarr.size()) {
+            stepTimer.setRepeats(false); // Make sure the Timer only runs once for each step
+            stepTimer.start(); // Start the Timer to process the next step after a delay
+        } else {
+            JOptionPane.showMessageDialog(frame, "Step-by-Step Tracing Completed");
+        }
+    }
+    
+    private void processNextStep() {
+        if (currentStep < inputarr.size()) {
+            processStep(inputarr.get(currentStep));
+        }
+    }
+    
+    
+    
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new App());
+    }
+
+
+    // Other methods (like notFull, isThere, fSnap)...
+     public static int notFull(String[][] data, int start, int end){
         for(int i = start; i < end; i++){
             if(data[i][2].equals("")){
                 return i;
@@ -188,13 +221,16 @@ public class App {
 
     public static int isThere(String[][] data, int start, int end, int val){
         for(int i = start; i < end; i++){
-            int var = Integer.valueOf(data[i][2]);
-            if(var == val){
-                return i;
+            if (!data[i][2].isEmpty()) {
+                int var = Integer.valueOf(data[i][2]);
+                if(var == val){
+                    return i;
+                }
             }
         }
         return -1;
     }
+    
     
     public static void fSnap(String[][] data, ArrayList<String> inputarr, int n) {
         ArrayList<String> info = new ArrayList<>();
@@ -378,5 +414,4 @@ public class App {
         });
         frame.setVisible(true);
     }
-
 }
