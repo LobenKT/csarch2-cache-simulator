@@ -105,6 +105,8 @@ public class App {
         
         // When simulate is clicked
         send.addActionListener((ActionListener) new ActionListener(){
+            int currentStep = 0; // Add this instance variable to track the current step
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 int n = Integer.valueOf(tf.getText());
@@ -125,6 +127,49 @@ public class App {
                 //} 
                 if(j1.isSelected()){
                     //TODO : Step-by-Step Tracing
+                    if (currentStep < n) {
+                        int val = Integer.valueOf(inputarr.get(currentStep));
+                        int setNum = val % 4;
+                        int k, l;
+            
+                        switch (setNum) {
+                            case 0:
+                                k = notFull(default_data, 0, 8);
+                                if (k != -1)
+                                    l = isThere(default_data, 0, k, val);
+                                else
+                                    l = isThere(default_data, 0, 8, val);
+            
+                                if (l != -1) {
+                                    // Cache hit
+                                    // Update cache state here
+                                    // Display cache state
+                                    displayCacheState(default_data);
+                                } else {
+                                    // Cache miss
+                                    if (k != -1) {
+                                        default_data[k][2] = inputarr.get(currentStep);
+                                    } else {
+                                        default_data[setNum][2] = inputarr.get(currentStep);
+                                    }
+                                    // Update your cache state here
+                                    // Display cache state
+                                    displayCacheState(default_data);
+                                }
+                                break;
+                            
+                            // TODO: Handle other cases (setNum 1, 2, 3) similarly
+                            // ...
+            
+                            default:
+                                //TODO: Handle invalid input
+                                break;
+                        }
+                        currentStep++;
+                    } else {
+                        // Step-by-Step Tracing is complete, reset the current step if needed
+                        // TODO: add a message to indicate completion
+                    }
 
 
                 } else if(j2.isSelected()){
@@ -132,6 +177,10 @@ public class App {
                     fSnap(default_data, inputarr, n);
                 }
             }
+                // TODO: Define the displayCacheState method to update the GUI with cache data
+             private void displayCacheState(String[][] cacheData) {
+            
+                }
         });
         frame.setVisible(true);
     }
