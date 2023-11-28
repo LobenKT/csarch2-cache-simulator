@@ -106,7 +106,7 @@ public class App {
 
                 String[] testcase = inputValue.split("\\s");
 
-                //t n = testcase.length;
+                int n = testcase.length;
 
 
                 ArrayList<String> inputarr = new ArrayList<String>( Arrays.asList(testcase));
