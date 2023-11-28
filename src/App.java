@@ -50,7 +50,9 @@ public class App {
         JPanel panel = new JPanel(); 
         JPanel bpanel = new JPanel();
         JPanel panel2 = new JPanel();
-        
+        JLabel label = new JLabel("Number of Memory Blocks:");
+        JTextField tf = new JTextField(5);
+        tf.setText("5");
         JLabel label1 = new JLabel("Inputs:");
         JTextField tf1 = new JTextField(30);
         JLabel label2 = new JLabel("Option:");
@@ -63,6 +65,8 @@ public class App {
         rd.add(j2);
         JButton send = new JButton("Simulate");
 
+        panel.add(label);
+        panel.add(tf);
         panel.add(label1);
         panel.add(tf1);
         panel.setSize(1500, 100);
@@ -102,11 +106,16 @@ public class App {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                int n = Integer.valueOf(tf.getText());
                 String inputValue = tf1.getText().toString();
-                String[] testcase = inputValue.split("\s");
-                int n = testcase.length;
+                String[] testcase = inputValue.split("\\s");
 
                 ArrayList<String> inputarr = new ArrayList<String>( Arrays.asList(testcase));
+                if (testcase.length < n){ //if input are less than
+                    for (int i = testcase.length; i < n; i++) {
+                        inputarr.add(null);
+                    }
+                }
                 
                 if(j1.isSelected()){
                     //TODO : Step-by-Step Tracing
