@@ -56,7 +56,7 @@ public class App {
         };
         mruBlock = new int[4]; // Assuming 4 sets, initialize with default values
         inputarr = new ArrayList<>();
-        stepTimer = new Timer(500, e -> processNextStep()); // Delay of 1000 ms (1 second)
+        stepTimer = new Timer(1000, e -> processNextStep()); // Delay of 1000 ms (1 second)
         initializeUI();
     }
 
