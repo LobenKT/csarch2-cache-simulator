@@ -45,9 +45,6 @@ public class App {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1500, 800);
 
-        // Creating the MenuBar and adding components
-        //JMenuBar mb = new JMenuBar();
-
         // Creating the panel at bottom and adding components
         JPanel outerpanel = new JPanel(); 
         JPanel panel = new JPanel(); 
@@ -111,20 +108,15 @@ public class App {
             public void actionPerformed(ActionEvent e) {
                 int n = Integer.valueOf(tf.getText());
                 String inputValue = tf1.getText().toString();
-                String[] testcase = inputValue.split("\\s");
-                //System.out.println(testcase.length);
-                //System.out.println("n: " + n);
-                //System.out.println("User input: " + inputValue);
-                //System.out.println(testcase.length);
+                String[] testcase = inputValue.split("\s");
+
                 ArrayList<String> inputarr = new ArrayList<String>( Arrays.asList(testcase));
                 if (testcase.length < n){ //if input are less than
                     for (int i = testcase.length; i < n; i++) {
                         inputarr.add(null);
                     }
                 }
-                //for (int i = 0; i < n*2; i++) {
-                //    System.out.println(inputarr.get(i));
-                //} 
+                
                 if(j1.isSelected()){
                     //TODO : Step-by-Step Tracing
                     if (currentStep < n) {
@@ -205,6 +197,7 @@ public class App {
     }
     
     public static void fSnap(String[][] data, ArrayList<String> inputarr, int n) {
+        ArrayList<String> info = new ArrayList<>();
         int hitcount = 0;
         int misscount = 0;
         int set0, set1, set2, set3;
@@ -229,6 +222,7 @@ public class App {
                     if(l != -1){
                         set0 = l;
                         hitcount++;
+                        info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set0][1]) + " | Status: Hit |");
                     } else {
                         //miss
                         if (k != -1) {
@@ -238,6 +232,7 @@ public class App {
                             data[set0][2] = inputarr.get(i);
                         }
                         misscount++;
+                        info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set0][1]) + " | Status: Miss |");
                     }
                     System.out.println(i +" Val:"+val%4 + " K: " + k + " L: " + l);
                     break;
@@ -252,6 +247,7 @@ public class App {
                     if(l != -1){
                         set1 = l;
                         hitcount++;
+                        info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set1][1]) + " | Status: Hit |");
                     } else {
                         //miss
                         if (k != -1) {
@@ -261,6 +257,7 @@ public class App {
                             data[set1][2] = inputarr.get(i);
                         }
                         misscount++;
+                        info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set1][1]) + " | Status: Miss |");
                     }
                     System.out.println(i + " Val:"+val%4 + " K: " + k + " L: " + l);
                     break;
@@ -275,6 +272,7 @@ public class App {
                     if(l != -1){
                         set2 = l;
                         hitcount++;
+                        info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set2][1]) + " | Status: Hit |");
                     } else {
                         //miss
                         if (k != -1 && k > 8) {
@@ -284,6 +282,7 @@ public class App {
                             data[set2][2] = inputarr.get(i);
                         }
                         misscount++;
+                        info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set2][1]) + " | Status: Miss |");
                     }
                     System.out.println(i + " Val:"+val%4 + " K: " + k + " L: " + l);
                     break;
@@ -298,6 +297,7 @@ public class App {
                     if(l != -1){
                         set3 = l;
                         hitcount++;
+                        info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set3][1]) + " | Status: Hit |");
                     } else {
                         //miss
                         if (k != -1) {
@@ -307,6 +307,7 @@ public class App {
                             data[set3][2] = inputarr.get(i);
                         }
                         misscount++;
+                        info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set3][1]) + " | Status: Miss |");
                     }
                     System.out.println(i+ " Val:"+val%4 + " K: " + k + " L: " + l);
                     break;
@@ -364,7 +365,6 @@ public class App {
 
         // Adding Components to the frame
         frame.setLayout(new BorderLayout());
-        //frame.add(BorderLayout.SOUTH, outerpanel);
         frame.add(BorderLayout.NORTH, simuPanel);
         
         // When simulate is clicked
@@ -372,6 +372,8 @@ public class App {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //insert code
+                WriteToFile file = new WriteToFile();
+                file.generate(info);
             }
         });
         frame.setVisible(true);
