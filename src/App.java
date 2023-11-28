@@ -53,6 +53,7 @@ public class App {
         JLabel label = new JLabel("Number of Memory Blocks:");
         JTextField tf = new JTextField(5);
         tf.setText("5");
+
         JLabel label1 = new JLabel("Inputs:");
         JTextField tf1 = new JTextField(30);
         JLabel label2 = new JLabel("Option:");
