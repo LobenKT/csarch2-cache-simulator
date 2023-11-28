@@ -124,7 +124,8 @@ public class App {
                 //    System.out.println(inputarr.get(i));
                 //} 
                 if(j1.isSelected()){
-                    //Step-by-Step Tracing
+                    //TODO : Step-by-Step Tracing
+
 
                 } else if(j2.isSelected()){
                     //Final Snapshot
@@ -371,7 +372,7 @@ public class App {
                 }
                 
                 if(j1.isSelected()){
-                    //Step-by-Step Tracing
+                    // TODO : Step-by-Step Tracing
 
                 } else if(j2.isSelected()){
                     //Final Snapshot
