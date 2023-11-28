@@ -21,7 +21,7 @@ public class App {
     }
 
     private void initializeUI() {
-        frame = new JFrame("Cache Simulation");
+        frame = new JFrame("8-way BSA/MRU ARCETA,DEQUICO,TAN,TIPAN");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 400);
 
