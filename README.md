@@ -25,7 +25,7 @@ TIPAN, Loben Klien A.
 3. Mid-repeat blocks: Start at block 0, repeat the sequence in the middle two times up to *n*-1 blocks, after which continue up to 2*n*. Then, repeat the sequence four times. Example: if *n*=8, sequence=0,1,2,3,4,5,6, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 {4x}
 ---
 ### Test Case Detail Analyses:
-###### Cache Table Format
+###### 8-way BSA Cache Table Format
 |  Set  | Block 0 | Block 1 | Block 2 | Block 3 | Block 4 | Block 5 | Block 6 | Block 7 |
 | :---: | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- |
 |   0   |         |         |         |         |         |         |         |         |
