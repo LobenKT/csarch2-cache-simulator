@@ -98,72 +98,27 @@ public class App {
         
         // When simulate is clicked
         send.addActionListener((ActionListener) new ActionListener(){
-            int currentStep = 0; // Add this instance variable to track the current step
+            //int currentStep = 0; // Add this instance variable to track the current step
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 String inputValue = tf1.getText().toString();
-                String[] testcase = inputValue.split("\s");
-                int n = testcase.length;
+
+                String[] testcase = inputValue.split("\\s");
+
+                //t n = testcase.length;
+
 
                 ArrayList<String> inputarr = new ArrayList<String>( Arrays.asList(testcase));
                 
                 if(j1.isSelected()){
-                    //TODO : Step-by-Step Tracing
-                    if (currentStep < n) {
-                        int val = Integer.valueOf(inputarr.get(currentStep));
-                        int setNum = val % 4;
-                        int k, l;
-            
-                        switch (setNum) {
-                            case 0:
-                                k = notFull(default_data, 0, 8);
-                                if (k != -1)
-                                    l = isThere(default_data, 0, k, val);
-                                else
-                                    l = isThere(default_data, 0, 8, val);
-            
-                                if (l != -1) {
-                                    // Cache hit
-                                    // Update cache state here
-                                    // Display cache state
-                                    displayCacheState(default_data);
-                                } else {
-                                    // Cache miss
-                                    if (k != -1) {
-                                        default_data[k][2] = inputarr.get(currentStep);
-                                    } else {
-                                        default_data[setNum][2] = inputarr.get(currentStep);
-                                    }
-                                    // Update your cache state here
-                                    // Display cache state
-                                    displayCacheState(default_data);
-                                }
-                                break;
-                            
-                            // TODO: Handle other cases (setNum 1, 2, 3) similarly
-                            // ...
-            
-                            default:
-                                //TODO: Handle invalid input
-                                break;
-                        }
-                        currentStep++;
-                    } else {
-                        // Step-by-Step Tracing is complete, reset the current step if needed
-                        // TODO: add a message to indicate completion
-                    }
-
-
+                    displayEachStep(default_data, inputarr, n);
                 } else if(j2.isSelected()){
                     //Final Snapshot
                     fSnap(default_data, inputarr, n);
                 }
             }
-                // TODO: Define the displayCacheState method to update the GUI with cache data
-             private void displayCacheState(String[][] cacheData) {
             
-                }
         });
         frame.setVisible(true);
     }
@@ -187,6 +142,93 @@ public class App {
         return -1;
     }
     
+    public static void displayEachStep(String[][] data, ArrayList<String> inputarr, int n) {
+        // Initialize frame and panels
+        JFrame frame = new JFrame("8-way BSA + MRU Step-by-Step");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1500, 800);
+        JPanel simuPanel = new JPanel();
+        Table cache = new Table();
+
+        // Loop for cache simulation
+        for (int i = 0; i < n; i++) {
+            int val = Integer.parseInt(inputarr.get(i));
+            int k, l;
+
+            // Cache logic (similar to fSnap)
+            switch (val % 4) {
+                case 0:
+                    k = notFull(data, 0, 8);
+                    l = (k != -1) ? isThere(data, 0, k, val) : isThere(data, 0, 8, val);
+                    processCacheHitMiss(data, k, l, val, 0);
+                    break;
+                case 1:
+                    k = notFull(data, 8, 16);
+                    l = (k != -1) ? isThere(data, 8, k, val) : isThere(data, 8, 16, val);
+                    processCacheHitMiss(data, k, l, val, 1);
+                    break;
+                case 2:
+                    k = notFull(data, 16, 24);
+                    l = (k != -1) ? isThere(data, 16, k, val) : isThere(data, 16, 24, val);
+                    processCacheHitMiss(data, k, l, val, 2);
+                    break;
+                case 3:
+                    k = notFull(data, 24, 32);
+                    l = (k != -1) ? isThere(data, 24, k, val) : isThere(data, 24, 32, val);
+                    processCacheHitMiss(data, k, l, val, 3);
+                    break;
+            }
+
+            // Update display after each operation
+            updateDisplay(simuPanel, cache, data);
+
+            // Optional delay
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Final frame setup
+        frame.setLayout(new BorderLayout());
+        frame.add(BorderLayout.CENTER, simuPanel);
+        frame.setVisible(true);
+    }
+
+    private static void processCacheHitMiss(String[][] data, int k, int l, int val, int setNumber) {
+        if (l != -1) {
+            // Hit: Update MRU
+            updateMRU(data, setNumber, l);
+        } else {
+            // Miss: Place in the next available or MRU position
+            int targetIndex = (k != -1) ? k : findMRU(data, setNumber);
+            data[targetIndex][2] = Integer.toString(val);
+            updateMRU(data, setNumber, targetIndex);
+        }
+    }
+
+    private static void updateMRU(String[][] data, int setNumber, int mruIndex) {
+        // Implement logic to update the Most Recently Used (MRU) position
+        // This logic should mark the block at 'mruIndex' as the most recently used
+    }
+
+    private static int findMRU(String[][] data, int setNumber) {
+        // Implement logic to find the Most Recently Used (MRU) block
+        // This is a placeholder function
+        return 0;
+    }
+
+    private static void updateDisplay(JPanel simuPanel, Table cache, String[][] data) {
+        simuPanel.removeAll();
+        simuPanel.add(cache.panel("Cache Memory", data));
+        simuPanel.revalidate();
+        simuPanel.repaint();
+    }
+
+    
+
+
     public static void fSnap(String[][] data, ArrayList<String> inputarr, int n) {
         ArrayList<String> info = new ArrayList<>();
         int hitcount = 0;
