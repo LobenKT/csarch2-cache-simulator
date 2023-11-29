@@ -9,6 +9,8 @@ DEQUICO, Beverly Joyce P.
 TAN, Jose Tristan T.
 
 TIPAN, Loben Klien A.
+---
+### Walkthrough Video: https://drive.google.com/file/d/1d2ewiHJMMZ4alPS1fYgELQPkVDW3aecG/view?usp=sharing
 
 ## Full Specifications
 
