@@ -50,6 +50,9 @@ public class App {
         JPanel panel = new JPanel(); 
         JPanel bpanel = new JPanel();
         JPanel panel2 = new JPanel();
+        JLabel label = new JLabel("Number of Memory Blocks:");
+        JTextField tf = new JTextField(5);
+        tf.setText("5");
 
         JLabel label1 = new JLabel("Inputs:");
         JTextField tf1 = new JTextField(30);
@@ -63,6 +66,8 @@ public class App {
         rd.add(j2);
         JButton send = new JButton("Simulate");
 
+        panel.add(label);
+        panel.add(tf);
         panel.add(label1);
         panel.add(tf1);
         panel.setSize(1500, 100);
@@ -95,15 +100,33 @@ public class App {
         frame.setLayout(new BorderLayout());
         frame.add(BorderLayout.SOUTH, outerpanel);
         frame.add(BorderLayout.CENTER, simuPanel);
+
+        JButton resetButton = new JButton("Reset");
+        panel2.add(resetButton); // Add the reset button to the panel
+
+        // ActionListener for the reset button
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                resetCacheData();
+                simuPanel.removeAll();
+                simuPanel.add(cache.panel("Cache Memory", default_data));
+                simuPanel.revalidate();
+                simuPanel.repaint();
+                // Clearing the input fields
+                tf.setText(""); // Clears the "Number of Memory Blocks" field
+                tf1.setText(""); // Clears the "Inputs" field
+            }
+        });
         
         // When simulate is clicked
         send.addActionListener((ActionListener) new ActionListener(){
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                int n = Integer.valueOf(tf.getText());
                 String inputValue = tf1.getText().toString();
                 String[] testcase = inputValue.split("\\s");
-                int n = testcase.length;
 
                 ArrayList<String> inputarr = new ArrayList<String>( Arrays.asList(testcase));
                 if (testcase.length < n){ //if input are less than
@@ -122,6 +145,15 @@ public class App {
             }
         });
         frame.setVisible(true);
+    }
+    
+
+    private static void resetCacheData() {
+        for (int i = 0; i < default_data.length; i++) {
+            default_data[i][2] = ""; // Reset the value in the cache
+            // If you are using an MRU marker, reset it as well
+            // default_data[i][3] = "0"; // Uncomment if MRU marker is used
+        }
     }
 
     public static void displayEachStep(String[][] data, ArrayList<String> inputarr, int n) {
@@ -184,14 +216,34 @@ public class App {
         }
     }
     private static void updateMRU(String[][] data, int setNumber, int mruIndex) {
-        // TODO: implement logic to update the Most Recently Used (MRU) position
-        // This logic should mark the block at 'mruIndex' as the most recently used
+    // Assuming 'data' array has an MRU marker in a specific column, e.g., column 3
+    int start = setNumber * 8; // Assuming each set has 8 blocks
+    int end = start + 8;
+
+    // Clear the MRU marker from all blocks in the set
+    for (int i = start; i < end; i++) {
+        data[i][3] = "0"; // Reset MRU marker
     }
-    private static int findMRU(String[][] data, int setNumber) {
-        // Implement logic to find the Most Recently Used (MRU) block
-        // This is a placeholder function
-        return 0;
+
+    // Set the MRU marker for the current block
+    data[mruIndex][3] = "1"; // Mark this block as MRU
+}
+
+private static int findMRU(String[][] data, int setNumber) {
+    // Find the block marked as MRU in the specified set
+    int start = setNumber * 8; // Assuming each set has 8 blocks
+    int end = start + 8;
+
+    for (int i = start; i < end; i++) {
+        if ("1".equals(data[i][3])) {
+            return i; // Return the index of the MRU block
+        }
     }
+
+    // If no block is marked as MRU, return the first block of the set as a default
+    return start;
+}
+
     private static void updateDisplay(JPanel simuPanel, Table cache, String[][] data) {
         simuPanel.removeAll();
         simuPanel.add(cache.panel("Cache Memory", data));
@@ -338,8 +390,7 @@ public class App {
 
             
         }
-        
-        //needed values
+
         float hitrate = (float) hitcount/(n);
         float missrate = (float) misscount/(n);
         float average_time = (hitrate) + (missrate*326);
