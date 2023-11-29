@@ -1,5 +1,8 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -119,12 +122,38 @@ public class App {
         outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
         outerPanel.setBackground(Color.PINK);
 
+        JButton reset = new JButton("Reset");
+
+        // Add reset button to the panel
+        panel2.add(reset);
+
+        // Define ActionListener for the reset button
+        reset.addActionListener(e -> {
+            // Reset the text field, data arrays, counters, etc.
+            tf1.setText("");
+            data = default_data.clone();
+            hitcount = 0;
+            misscount = 0;
+            currentStep = 0;
+            inputarr.clear();
+            displayCacheState(default_data); // Update the table display
+            // Any other resets as required
+        });
+
+
+
         simuPanel = new JPanel();
 
         // Button action listener
         send.addActionListener(e -> {
             
             String inputValue = tf1.getText();
+
+            //String inputValue = tf1.getText();
+            if (!validateInput(inputValue)) {
+                return; // Stop processing if input is invalid
+            }
+
             String[] testcase = inputValue.split("\\s");
             int n = testcase.length;
 
@@ -149,13 +178,65 @@ public class App {
         frame.add(outerPanel, BorderLayout.SOUTH);
         frame.setVisible(true);
     }
-
+/* 
     private void initializeCacheTable() {
         DefaultTableModel tableModel = new DefaultTableModel(default_data, new String[]{"Set", "Block", "Value"});
         cacheTable = new JTable(tableModel);
         //JScrollPane scrollPane = new JScrollPane(cacheTable);
         simuPanel.add(cacheTable);
     }
+*/
+    private boolean validateInput(String input) {
+        // Example validation: input should not be empty and should be numeric
+        if (input == null || input.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Input is empty", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        // Additional validation rules can be added here
+        return true;
+    }
+        private void initializeCacheTable() {
+        DefaultTableModel tableModel = new DefaultTableModel(data, new String[]{"Set", "Block", "Value"}) {
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make cells not editable
+            }
+        };
+        cacheTable = new JTable(tableModel);
+
+        // Center align cell text and apply color scheme
+        cacheTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                c.setBackground(row % 2 == 0 ? Color.LIGHT_GRAY : Color.WHITE); // Alternate row colors
+                setHorizontalAlignment(CENTER); // Center text
+                return c;
+            }
+        });
+
+        // Bold column headers
+        JTableHeader header = cacheTable.getTableHeader();
+        header.setDefaultRenderer(new BoldHeaderRenderer());
+
+        JScrollPane scrollPane = new JScrollPane(cacheTable);
+        simuPanel.add(scrollPane);
+    }
+
+     // Custom renderer for bold header
+     private static class BoldHeaderRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if (comp instanceof JLabel) {
+                ((JLabel) comp).setHorizontalAlignment(JLabel.CENTER);
+                comp.setFont(comp.getFont().deriveFont(Font.BOLD));
+                comp.setBackground(Color.GRAY);  // Set the background color to grey
+                comp.setForeground(Color.WHITE); // Optional: Set the text color to white for better readability
+            }
+            return comp;
+        }
+    }
+
     
     private void displayCacheState(String[][] cacheData) {
         DefaultTableModel tableModel = (DefaultTableModel) cacheTable.getModel();
