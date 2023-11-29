@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class WriteToFile {
   void generate(ArrayList<String> info) {
     try {
-      FileWriter myWriter = new FileWriter("testlog.txt");
+      FileWriter myWriter = new FileWriter("text-log.txt");
       for(int i = 0; i < info.size(); i++){
         myWriter.write(info.get(i));
         myWriter.write("\n");

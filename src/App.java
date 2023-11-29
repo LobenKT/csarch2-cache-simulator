@@ -19,12 +19,12 @@ public class App {
     private ArrayList<String> inputarr;
     private int[] mruBlock; // Initialize this array in the constructor
     private Timer stepTimer;
-
-        private ArrayList<String> info = new ArrayList<>();
-        private int hitcount = 0;
-        private int misscount = 0;
-        private int set0, set1, set2, set3;
-        private int k, l;
+    private JTextArea textArea = new JTextArea(20, 50); // 20 rows and 50 columns
+    private ArrayList<String> info = new ArrayList<>();
+    private int hitcount = 0;
+    private int misscount = 0;
+    private int set0, set1, set2, set3;
+    private int k, l;
 
 
 
@@ -76,136 +76,173 @@ public class App {
         initializeUI();
     }
 
-    private void initializeUI() {
-        frame = new JFrame("8-way BSA + MRU");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1500, 800);
+        private void initializeUI() {
+            frame = new JFrame("8-way BSA + MRU");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(1500, 800);
 
-        JPanel outerPanel = new JPanel();
-        // Initialize other panels and components...
-        // Add them to outerPanel...
-        JPanel panel = new JPanel(); 
-        JPanel bpanel = new JPanel();
-        JPanel panel2 = new JPanel();
-
-        JLabel label1 = new JLabel("Inputs:");
-        JTextField tf1 = new JTextField(30);
-        JLabel label2 = new JLabel("Option:");
-        JRadioButton j1 = new JRadioButton("Step-by-Step Tracing");
-        JRadioButton j2 = new JRadioButton("Final Memory Snapshot", true);
-        j1.setOpaque(false);
-        j2.setOpaque(false);
-        ButtonGroup rd = new ButtonGroup();
-        rd.add(j1);
-        rd.add(j2);
-        JButton send = new JButton("Simulate");
-
-        panel.add(label1);
-        panel.add(tf1);
-        panel.setSize(1500, 100);
-
-        bpanel.add(label2);
-        bpanel.add(j1);
-        bpanel.add(j2);
-        bpanel.setSize(1500, 100);
-
-        panel2.add(send);
-        panel2.setSize(1500, 100);
-
-        panel.setBackground(Color.LIGHT_GRAY);
-        bpanel.setBackground(Color.LIGHT_GRAY);
-        panel2.setBackground(Color.LIGHT_GRAY);
-
-        outerPanel.add(panel);
-        outerPanel.add(bpanel);
-        outerPanel.add(panel2);
-        outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
-        outerPanel.setBackground(Color.PINK);
-
-        JButton reset = new JButton("Reset");
-
-        // Add reset button to the panel
-        panel2.add(reset);
-
-        // Define ActionListener for the reset button
-        reset.addActionListener(e -> {
-            // Reset the text field, data arrays, counters, etc.
-            tf1.setText("");
-            data = default_data.clone();
-            hitcount = 0;
-            misscount = 0;
-            currentStep = 0;
-            inputarr.clear();
-            displayCacheState(default_data); // Update the table display
-            // Any other resets as required
-        });
+            // Create a JPanel for the title
+            JPanel titlePanel = new JPanel();
+            JLabel titleLabel = new JLabel("8-way BSA + MRU");
+            titleLabel.setFont(new Font("Verdana", Font.BOLD, 24)); // Set the font and size
+            titlePanel.add(titleLabel);
 
 
+            JPanel outerPanel = new JPanel();
+            // Initialize other panels and components...
+            // Add them to outerPanel...
+            JPanel panel = new JPanel(); 
+            JPanel bpanel = new JPanel();
+            JPanel panel2 = new JPanel();
 
-        simuPanel = new JPanel();
+            JLabel label1 = new JLabel("Inputs:");
+            JTextField tf1 = new JTextField(30);
+            JLabel label2 = new JLabel("Option:");
+            JRadioButton j1 = new JRadioButton("Step-by-Step Tracing");
+            JRadioButton j2 = new JRadioButton("Final Memory Snapshot", true);
+            j1.setOpaque(false);
+            j2.setOpaque(false);
+            ButtonGroup rd = new ButtonGroup();
+            rd.add(j1);
+            rd.add(j2);
+            JButton send = new JButton("Simulate");
 
-        // Button action listener
-        send.addActionListener(e -> {
+            panel.add(label1);
+            panel.add(tf1);
+            panel.setSize(1500, 100);
+
+            bpanel.add(label2);
+            bpanel.add(j1);
+            bpanel.add(j2);
+            bpanel.setSize(1500, 100);
+
+            panel2.add(send);
+            panel2.setSize(1500, 100);
+
+            panel.setBackground(Color.LIGHT_GRAY);
+            bpanel.setBackground(Color.LIGHT_GRAY);
+            panel2.setBackground(Color.LIGHT_GRAY);
+
+            outerPanel.add(panel);
+            outerPanel.add(bpanel);
+            outerPanel.add(panel2);
+            outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
+            outerPanel.setBackground(Color.LIGHT_GRAY);
+
+            JButton reset = new JButton("Reset");
+
+            // Add reset button to the panel
+            panel2.add(reset);
+
+            // Create a JScrollPane for the text area
+             JScrollPane textScrollPane = new JScrollPane(textArea);
+            textScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+   
+
+            // Create a panel for the text area
+            JPanel textPanel = new JPanel();
+            textPanel.setLayout(new BorderLayout()); // Use BorderLayout to occupy the entire panel
+
+            // Add the text area to the text panel
+            textPanel.add(textScrollPane, BorderLayout.CENTER);
+
+            // Create a JSplitPane to split the space between text area and table
+            JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+            splitPane.setLeftComponent(textPanel); // Add the text area to the left
+            splitPane.setRightComponent(simuPanel); // Add the table to the right
+
+            // Add the splitPane to the frame
+            frame.add(splitPane, BorderLayout.CENTER);
+
             
-            String inputValue = tf1.getText();
 
-            //String inputValue = tf1.getText();
-            if (!validateInput(inputValue)) {
-                return; // Stop processing if input is invalid
-            }
-
-            String[] testcase = inputValue.split("\\s");
-            int n = testcase.length;
-
-            inputarr.clear();
-            inputarr.addAll(Arrays.asList(testcase));
-            while (inputarr.size() < n) {
-                inputarr.add(null);
-            }
-
-            if (j1.isSelected()) {
-                // Step-by-Step Tracing
+            // Define ActionListener for the reset button
+            reset.addActionListener(e -> {
+                // Reset the text field, data arrays, counters, etc.
+                tf1.setText("");
+                data = default_data.clone();
+                hitcount = 0;
+                misscount = 0;
                 currentStep = 0;
-                processStep();
-            } else if (j2.isSelected()) {
-                // Final Snapshot
-                fSnap(default_data, inputarr, n);
-            }
-        });
+                inputarr.clear();
 
-        initializeCacheTable();
-        //Dimension size = new Dimension(500, 800); 
-        //simuPanel.setPreferredSize(size);
-        simuPanel.setBorder(BorderFactory.createEmptyBorder(10, 600, 0, 600));
-        frame.add(simuPanel, BorderLayout.CENTER);
-        frame.add(outerPanel, BorderLayout.SOUTH);
-        //frame.add(right, BorderLayout.WEST);
-        //frame.add(left, BorderLayout.EAST);
-        frame.setVisible(true);
-    }
-/* 
-    private void initializeCacheTable() {
-        DefaultTableModel tableModel = new DefaultTableModel(default_data, new String[]{"Set", "Block", "Value"});
-        cacheTable = new JTable(tableModel);
-        //JScrollPane scrollPane = new JScrollPane(cacheTable);
-        simuPanel.add(cacheTable);
-    }
-*/
-    private boolean validateInput(String input) {
-        // Example validation: input should not be empty and should be numeric
-        if (input == null || input.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "Input is empty", "Input Error", JOptionPane.ERROR_MESSAGE);
-            return false;
+                // Set the third column of the table to empty
+                for (int i = 0; i < data.length; i++) {
+                    data[i][2] = ""; // Assuming the third column contains empty strings
+                }
+
+                displayCacheState(default_data); // Update the table display
+                // Any other resets as required
+            });
+
+
+
+            simuPanel = new JPanel();
+
+            // Button action listener
+            send.addActionListener(e -> {
+                
+                String inputValue = tf1.getText();
+
+                //String inputValue = tf1.getText();
+                if (!validateInput(inputValue)) {
+                    return; // Stop processing if input is invalid
+                }
+
+                String[] testcase = inputValue.split("\\s");
+                int n = testcase.length;
+
+                inputarr.clear();
+                inputarr.addAll(Arrays.asList(testcase));
+                while (inputarr.size() < n) {
+                    inputarr.add(null);
+                }
+
+                if (j1.isSelected()) {
+                    // Step-by-Step Tracing
+                    currentStep = 0;
+                    processStep();
+                } else if (j2.isSelected()) {
+                    // Final Snapshot
+                    fSnap(default_data, inputarr, n);
+                }
+            });
+
+            initializeCacheTable();
+            //Dimension size = new Dimension(500, 800); 
+            //simuPanel.setPreferredSize(size);
+            //setupCellRenderer();
+            simuPanel.setBorder(BorderFactory.createEmptyBorder(10, 600, 0, 600));
+            frame.add(titlePanel, BorderLayout.NORTH); // Add the title panel to the top
+            frame.add(simuPanel, BorderLayout.CENTER);
+            frame.add(outerPanel, BorderLayout.SOUTH);
+            //frame.add(right, BorderLayout.WEST);
+            //frame.add(left, BorderLayout.EAST);
+            frame.setVisible(true);
         }
-        // Additional validation rules can be added here
-        return true;
-    }
+
+        private boolean validateInput(String input) {
+            // Example validation: input should not be empty and should be numeric
+            if (input == null || input.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Input is empty", "Input Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            if (!input.matches("^[0-9\\s]+$")) {
+                JOptionPane.showMessageDialog(frame, "Input should contain only integers and spaces", "Input Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            // Additional validation rules can be added here
+            return true;
+        }
+
         private void initializeCacheTable() {
         DefaultTableModel tableModel = new DefaultTableModel(data, new String[]{"Set", "Block", "Value"}) {
             public boolean isCellEditable(int row, int column) {
                 return false; // Make cells not editable
             }
         };
+
         cacheTable = new JTable(tableModel);
 
         // Center align cell text and apply color scheme
@@ -249,7 +286,6 @@ public class App {
             return comp;
         }
     }
-
     
     private void displayCacheState(String[][] cacheData) {
         DefaultTableModel tableModel = (DefaultTableModel) cacheTable.getModel();
@@ -261,7 +297,8 @@ public class App {
             String input = inputarr.get(currentStep);
             if (input != null && !input.isEmpty()) {
                 int val = Integer.parseInt(input);
-                
+
+
                 switch (val % 4) {
                     case 0:
                         k = notFull(data, 0, 8);
@@ -286,6 +323,7 @@ public class App {
                             info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set0][1]) + " | Status: Miss |");
                         }
                         System.out.println(currentStep +" Val:"+val%4 + " K: " + k + " L: " + l);
+
                         break;
     
                     case 1:
@@ -450,7 +488,8 @@ public class App {
         }
     }
     
-    
+
+
     
 
     public static void main(String[] args) {
