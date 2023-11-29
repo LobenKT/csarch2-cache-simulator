@@ -79,7 +79,7 @@ public class App {
     private void initializeUI() {
         frame = new JFrame("8-way BSA + MRU");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1500, 800);
+        frame.setSize(800, 800);
 
         JPanel outerPanel = new JPanel();
         // Initialize other panels and components...
@@ -100,6 +100,9 @@ public class App {
         rd.add(j2);
         JButton send = new JButton("Simulate");
 
+        // Set the preferred size for the input field
+    //    tf1.setPreferredSize(new Dimension(300, tf1.getPreferredSize().height)); // Set the width to 300 pixels
+        tf1.setPreferredSize(new Dimension(500, tf1.getPreferredSize().height)); // Set the width to 500 pixels
         panel.add(label1);
         panel.add(tf1);
         panel.setSize(1500, 100);
@@ -142,7 +145,12 @@ public class App {
 
 
 
-        simuPanel = new JPanel();
+        //simuPanel = new JPanel();
+        simuPanel = new JPanel(new BorderLayout()); // Use BorderLayout for simuPanel
+        // Add margins by creating an empty border
+        int margin = 50; // You can adjust this value to control the margin size
+        simuPanel.setBorder(BorderFactory.createEmptyBorder(margin, margin, margin, margin));
+
 
         // Button action listener
         send.addActionListener(e -> {
@@ -178,14 +186,7 @@ public class App {
         frame.add(outerPanel, BorderLayout.SOUTH);
         frame.setVisible(true);
     }
-/* 
-    private void initializeCacheTable() {
-        DefaultTableModel tableModel = new DefaultTableModel(default_data, new String[]{"Set", "Block", "Value"});
-        cacheTable = new JTable(tableModel);
-        //JScrollPane scrollPane = new JScrollPane(cacheTable);
-        simuPanel.add(cacheTable);
-    }
-*/
+
     private boolean validateInput(String input) {
         // Example validation: input should not be empty and should be numeric
         if (input == null || input.trim().isEmpty()) {
@@ -218,8 +219,8 @@ public class App {
         JTableHeader header = cacheTable.getTableHeader();
         header.setDefaultRenderer(new BoldHeaderRenderer());
 
-        JScrollPane scrollPane = new JScrollPane(cacheTable);
-        simuPanel.add(scrollPane);
+        simuPanel.setLayout(new BorderLayout());
+        simuPanel.add(new JScrollPane(cacheTable), BorderLayout.CENTER);
     }
 
      // Custom renderer for bold header
