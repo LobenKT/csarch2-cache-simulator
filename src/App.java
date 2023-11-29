@@ -124,11 +124,38 @@ public class App {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                
+                String numBlocksStr = tf.getText().trim();
+                String inputsStr = tf1.getText().trim();
+        
+                // Validate the number of memory blocks field
+                if (numBlocksStr.isEmpty() || !isInteger(numBlocksStr)) {
+                    JOptionPane.showMessageDialog(frame, "Please enter a valid integer for the number of memory blocks.");
+                    return; // Stop further processing
+                }
+        
+                int numBlocks = Integer.parseInt(numBlocksStr);
+        
+                // Validate the inputs field
+                if (inputsStr.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "Input field cannot be empty.");
+                    return; // Stop further processing
+                }
+        
+                String[] testcase = inputsStr.split("\\s+");
+                ArrayList<String> inputarr = new ArrayList<>(Arrays.asList(testcase));
+        
+                // Additional check to ensure enough inputs are provided
+                if (testcase.length < numBlocks) {
+                    JOptionPane.showMessageDialog(frame, "The number of inputs provided is less than the specified number of memory blocks.");
+                    return; // Stop further processing
+                }
+
                 int n = Integer.valueOf(tf.getText());
                 String inputValue = tf1.getText().toString();
-                String[] testcase = inputValue.split("\\s");
+            //    String[] testcase = inputValue.split("\\s");
 
-                ArrayList<String> inputarr = new ArrayList<String>( Arrays.asList(testcase));
+            //    ArrayList<String> inputarr = new ArrayList<String>( Arrays.asList(testcase));
                 if (testcase.length < n){ //if input are less than
                     for (int i = testcase.length; i < n; i++) {
                         inputarr.add(null);
@@ -145,6 +172,14 @@ public class App {
             }
         });
         frame.setVisible(true);
+    }
+    private static boolean isInteger(String s) {
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
     
 
