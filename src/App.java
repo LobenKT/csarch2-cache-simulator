@@ -145,8 +145,8 @@ public class App {
 
 
 
-        //simuPanel = new JPanel();
-        simuPanel = new JPanel(new BorderLayout()); // Use BorderLayout for simuPanel
+        simuPanel = new JPanel();
+        //simuPanel = new JPanel(new BorderLayout()); // Use BorderLayout for simuPanel
         // Add margins by creating an empty border
         int margin = 50; // You can adjust this value to control the margin size
         simuPanel.setBorder(BorderFactory.createEmptyBorder(margin, margin, margin, margin));
@@ -196,7 +196,8 @@ public class App {
         // Additional validation rules can be added here
         return true;
     }
-        private void initializeCacheTable() {
+
+    private void initializeCacheTable() {
         DefaultTableModel tableModel = new DefaultTableModel(data, new String[]{"Set", "Block", "Value"}) {
             public boolean isCellEditable(int row, int column) {
                 return false; // Make cells not editable
@@ -219,8 +220,18 @@ public class App {
         JTableHeader header = cacheTable.getTableHeader();
         header.setDefaultRenderer(new BoldHeaderRenderer());
 
-        simuPanel.setLayout(new BorderLayout());
-        simuPanel.add(new JScrollPane(cacheTable), BorderLayout.CENTER);
+        // Add the table and header directly to simuPanel
+        simuPanel.setLayout(new GridBagLayout()); // Use GridBagLayout for flexible layout
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0; // Allow horizontal expansion
+        gbc.weighty = 1.0; // Allow vertical expansion
+        simuPanel.add(header, gbc);
+
+        gbc.gridy = 1;
+        simuPanel.add(cacheTable, gbc);
     }
 
      // Custom renderer for bold header
