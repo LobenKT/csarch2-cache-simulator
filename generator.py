@@ -1,10 +1,6 @@
 from random import randint
 
 n = 32
-
-
-
-
 passed = False
 
 while not passed:
