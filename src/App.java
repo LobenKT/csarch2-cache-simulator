@@ -174,8 +174,13 @@ public class App {
         });
 
         initializeCacheTable();
+        //Dimension size = new Dimension(500, 800); 
+        //simuPanel.setPreferredSize(size);
+        simuPanel.setBorder(BorderFactory.createEmptyBorder(10, 600, 0, 600));
         frame.add(simuPanel, BorderLayout.CENTER);
         frame.add(outerPanel, BorderLayout.SOUTH);
+        //frame.add(right, BorderLayout.WEST);
+        //frame.add(left, BorderLayout.EAST);
         frame.setVisible(true);
     }
 /* 
@@ -217,9 +222,17 @@ public class App {
         // Bold column headers
         JTableHeader header = cacheTable.getTableHeader();
         header.setDefaultRenderer(new BoldHeaderRenderer());
+        cacheTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        cacheTable.setSize(200, 800);
 
-        JScrollPane scrollPane = new JScrollPane(cacheTable);
-        simuPanel.add(scrollPane);
+        
+
+        //JScrollPane scrollPane = new JScrollPane(cacheTable);
+        simuPanel.add(header, BorderLayout.NORTH);
+        simuPanel.add(cacheTable, BorderLayout.CENTER);
+        
+        simuPanel.setSize(500, 200);
+        simuPanel.setLayout(new BoxLayout(simuPanel, BoxLayout.PAGE_AXIS));
     }
 
      // Custom renderer for bold header
