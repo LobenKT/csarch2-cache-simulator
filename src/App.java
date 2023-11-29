@@ -10,15 +10,26 @@ public class App {
     private JFrame frame;
     private JTable cacheTable;
     private String[][] default_data;
+    private String[][] data;
     private JPanel simuPanel;
     private int currentStep = 0;
     private ArrayList<String> inputarr;
     private int[] mruBlock; // Initialize this array in the constructor
     private Timer stepTimer;
 
+        private ArrayList<String> info = new ArrayList<>();
+        private int hitcount = 0;
+        private int misscount = 0;
+        private int set0, set1, set2, set3;
+        private int k, l;
+
 
 
     public App() {
+        set0 = 0;
+        set1 = 0;
+        set2 = 0;
+        set3 = 0;
         default_data = new String[][] {
             // Initialize your default data here...
             { "0", "0", "" },
@@ -54,10 +65,11 @@ public class App {
             { "3", "6", "" },
             { "3", "7", "" },
         };
+        data = default_data;
         mruBlock = new int[4]; // Assuming 4 sets, initialize with default values
         Arrays.fill(mruBlock, 7); // Initialize each set's MRU to point to the last block (block 7)
         inputarr = new ArrayList<>();
-        stepTimer = new Timer(0, e -> processNextStep()); // Delay of 1000 ms (1 second)
+        stepTimer = new Timer(250, e -> processNextStep()); // Delay of 1000 ms (1 second)
         initializeUI();
     }
 
@@ -144,8 +156,8 @@ public class App {
     private void initializeCacheTable() {
         DefaultTableModel tableModel = new DefaultTableModel(default_data, new String[]{"Set", "Block", "Value"});
         cacheTable = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(cacheTable);
-        simuPanel.add(scrollPane);
+        //JScrollPane scrollPane = new JScrollPane(cacheTable);
+        simuPanel.add(cacheTable);
     }
     
     private void displayCacheState(String[][] cacheData) {
@@ -158,36 +170,111 @@ public class App {
             String input = inputarr.get(currentStep);
             if (input != null && !input.isEmpty()) {
                 int val = Integer.parseInt(input);
-                int setNum = val % 4; // Assuming 4 sets in the cache
-                int start = setNum * 8; // Assuming 8 blocks per set
-                int end = start + 8;
+                
+                switch (val % 4) {
+                    case 0:
+                        k = notFull(data, 0, 8);
+                        if(k != -1)
+                            l = isThere(data, 0, k, val);
+                        else
+                            l = isThere(data, 0, 8, val);
+                        //hit
+                        if(l != -1){
+                            set0 = l;
+                            hitcount++;
+                            info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set0][1]) + " | Status: Hit |");
+                        } else {
+                            //miss
+                            if (k != -1) {
+                                data[k][2] = inputarr.get(currentStep);
+                                set0 = k;
+                            } else {
+                                data[set0][2] = inputarr.get(currentStep);
+                            }
+                            misscount++;
+                            info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set0][1]) + " | Status: Miss |");
+                        }
+                        System.out.println(currentStep +" Val:"+val%4 + " K: " + k + " L: " + l);
+                        break;
     
-                int existingIndex = isThere(default_data, start, end, val);
-                int emptyIndex = notFull(default_data, start, end);
-    
-                // Check for cache hit or miss
-                if (existingIndex != -1) {
-                    // Cache hit
-                    // Update MRU for the set
-                    mruBlock[setNum] = existingIndex - start;
-                } else {
-                    // Cache miss
-                    if (emptyIndex != -1) {
-                        // If there is an empty block, use it
-                        default_data[emptyIndex][2] = String.valueOf(val);
-                        mruBlock[setNum] = emptyIndex - start;
-                    } else {
-                        // If all blocks are full, replace the MRU block
-                        int mruIndex = start + mruBlock[setNum];
-                        default_data[mruIndex][2] = String.valueOf(val);
-    
-                        // Update MRU to point to the next block (circularly)
-                        mruBlock[setNum] = (mruBlock[setNum] + 1) % 8;
-                    }
+                    case 1:
+                        k = notFull(data, 8, 16);
+                        if(k != -1)
+                            l = isThere(data, 8, k, val);
+                        else
+                            l = isThere(data, 8, 16, val);
+                        //hit
+                        if(l != -1){
+                            set1 = l;
+                            hitcount++;
+                            info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set1][1]) + " | Status: Hit |");
+                        } else {
+                            //miss
+                            if (k != -1) {
+                                data[k][2] = inputarr.get(currentStep);
+                                set1 = k;
+                            } else {
+                                data[set1][2] = inputarr.get(currentStep);
+                            }
+                            misscount++;
+                            info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set1][1]) + " | Status: Miss |");
+                        }
+                        System.out.println(currentStep + " Val:"+val%4 + " K: " + k + " L: " + l);
+                        break;
+                        
+                    case 2:
+                        k = notFull(data, 16, 24);
+                        if(k != -1)
+                            l = isThere(data, 16, k, val);
+                        else
+                            l = isThere(data, 16, 24, val);
+                        //hit
+                        if(l != -1){
+                            set2 = l;
+                            hitcount++;
+                            info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set2][1]) + " | Status: Hit |");
+                        } else {
+                            //miss
+                            if (k != -1 && k > 8) {
+                                data[k][2] = inputarr.get(currentStep);
+                                set2 = k;
+                            } else {
+                                data[set2][2] = inputarr.get(currentStep);
+                            }
+                            misscount++;
+                            info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set2][1]) + " | Status: Miss |");
+                        }
+                        System.out.println(currentStep + " Val:"+val%4 + " K: " + k + " L: " + l);
+                        break;
+                        
+                    case 3:
+                        k = notFull(data, 24, 32);
+                        if(k != -1)
+                            l = isThere(data, 24, k, val);
+                        else
+                            l = isThere(data, 24, 32, val);
+                        //hit
+                        if(l != -1){
+                            set3 = l;
+                            hitcount++;
+                            info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set3][1]) + " | Status: Hit |");
+                        } else {
+                            //miss
+                            if (k != -1) {
+                                data[k][2] = inputarr.get(currentStep);
+                                set3 = k;
+                            } else {
+                                data[set3][2] = inputarr.get(currentStep);
+                            }
+                            misscount++;
+                            info.add(String.valueOf(val) + " | Set " + String.valueOf(val%4) + " | Block " + String.valueOf(data[set3][1]) + " | Status: Miss |");
+                        }
+                        System.out.println(currentStep + " Val:"+val%4 + " K: " + k + " L: " + l);
+                        break;
                 }
     
                 // Update and display the cache state
-                displayCacheState(default_data);
+                displayCacheState(data);
             }
     
             // Increment step for the next iteration
